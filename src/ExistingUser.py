@@ -4,9 +4,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing import Dict
 import numpy as np
 
-path = os.path.join(os.getcwd(), 'Data/Processed_matrix.csv')
-matrix = pd.read_csv(path, index_col='UserId')
-
 def __recommend_products(ratings_filled : pd.DataFrame, new_user_ratings, top_k=5, similar_users_n=5):
     """
     ratings_df: pd.DataFrame with UserID as index and ProductIDs as columns.
@@ -30,8 +27,6 @@ def __recommend_products(ratings_filled : pd.DataFrame, new_user_ratings, top_k=
     # Step 4: Get top N similar users to the new user
     similar_users = similarity_df["new_user"].drop("new_user").nlargest(similar_users_n)
 
-    print(similar_users)
-
     # Step 5: Predict ratings
     weighted_ratings = np.dot(similar_users.values, ratings_filled.loc[similar_users.index])
     sim_sum = similar_users.sum()
@@ -47,7 +42,9 @@ def __recommend_products(ratings_filled : pd.DataFrame, new_user_ratings, top_k=
     return recommended.index.tolist()
 
 def existing_user_recomendation(user_ratings : Dict, n : int):
-    
+    path = os.path.join(os.getcwd(), 'Data/Processed_matrix.csv')
+    matrix = pd.read_csv(path, index_col='UserId')
+
     result = __recommend_products(
         ratings_filled=matrix, 
         new_user_ratings = user_ratings,
